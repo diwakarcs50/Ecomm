@@ -1,5 +1,7 @@
 const mongoose=require('mongoose')
 const validator=require('validator')
+const bcrypt=require('bcrypt')
+const jwt =require('jsonwebtoken')
 
 
 const userschema=new mongoose.Schema({
@@ -59,6 +61,14 @@ userschema.pre('save',async function(next){
 userschema.methods.IsPasswordValidate=async (usersendpassword){
     return await bcypt.compare(usersendpassword,this.password)
 
+}
+
+//creatin a json web token 
+userschema.methods.getToken=function(){
+    return jwt.sign({id:this._id},//here we can mention things like email or other payloads
+        process.env.JWT_SECRET,{
+        expiresIn:process.env.JWT_EXPIRY,
+    })
 }
 
 
