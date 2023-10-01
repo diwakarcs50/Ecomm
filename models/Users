@@ -1,0 +1,66 @@
+const mongoose=require('mongoose')
+const validator=require('validator')
+
+
+const userschema=new mongoose.Schema({
+    name:{
+        type:String,
+        required:[true,'please provide a name'],
+        maxlength:[40,'Maximum character required is 40']
+
+    },
+    email:{
+        type:String,
+        required:[true,'please provide a name'],
+        validate:[validator.isEmail,'please enter a valid email'],
+        unique:true  //checks for duplication
+    },
+    password:{
+        type:String,
+        required:true,
+        minlength:[8,'password must be at least 8 characters'],
+        select:false //when you send the whole object but not password
+    },
+    role:{
+        type:String,
+        default:'user'
+    },
+    photo:{
+        id:{
+            type:String,
+            required:true
+
+        },
+        secure_url:{
+            type:String,
+            requirerd:true
+
+        }
+    },
+    forgotpasswordToken:String,
+    forgotpasswordExpiry:Date,
+    createdAt:{
+        type:Date,
+        default:Date.now
+    },
+
+   
+})
+
+//encrypt password before save
+userschema.pre('save',async function(next){
+    if(!this.isModified('password')){
+        return next()
+    }
+    this.password=await bcrypt.hash(this.password,10)
+})
+
+//validate the password
+userschema.methods.IsPasswordValidate=async (usersendpassword){
+    return await bcypt.compare(usersendpassword,this.password)
+
+}
+
+
+
+module.exports=mongoose.model('User',userschema)
