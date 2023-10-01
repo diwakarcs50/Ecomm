@@ -2,6 +2,7 @@ const mongoose=require('mongoose')
 const validator=require('validator')
 const bcrypt=require('bcrypt')
 const jwt =require('jsonwebtoken')
+const crypto=require('crypto')
 
 
 const userschema=new mongoose.Schema({
@@ -59,17 +60,29 @@ userschema.pre('save',async function(next){
 
 //validate the password
 userschema.methods.IsPasswordValidate=async (usersendpassword){
-    return await bcypt.compare(usersendpassword,this.password)
+    return await bcrypt.compare(usersendpassword,this.password)
 
 }
 
-//creatin a json web token 
-userschema.methods.getToken=function(){
+//creating a json web token 
+userschema.methods.getjwtToken=function(){
     return jwt.sign({id:this._id},//here we can mention things like email or other payloads
         process.env.JWT_SECRET,{
         expiresIn:process.env.JWT_EXPIRY,
     })
 }
+
+userschema.methods.getforgotPassword=function(){
+
+    const forgotToken=crypto.randomBytes(20).toString('hex')
+
+    this.forgotpasswordToken=crypto.createHash('sha256').update(forgotToken).digest('hex')
+    this.forgotpasswordExpiry=Date.now()+ 20*60*1000
+
+    return forgotToken
+}
+
+
 
 
 
