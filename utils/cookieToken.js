@@ -1,3 +1,4 @@
+
 const Cookietoken=(res,User)=>{
 
 const token=User.getjwtToken()
@@ -8,9 +9,9 @@ const options={
 
 res.status(200).cookie('cookieToken',token,options).json({
   success:true,
-  User,
+  token,
+  User
 
 })
-
 }
 module.exports=Cookietoken

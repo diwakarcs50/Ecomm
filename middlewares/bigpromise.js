@@ -1,5 +1,2 @@
-module.exports=(func)=>{
-    Promise.
-    resolve(req,res,next)
-    .catch(next)
-}
+module.exports=(func)=>(req,res,next)=>
+    Promise.resolve(req,res,next).catch(next)
