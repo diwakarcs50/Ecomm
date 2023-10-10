@@ -1,7 +1,13 @@
+const crypto=require("crypto")
 const User = require('../models/Users');
 const customError = require('../utils/customerror');
 const Cookietoken = require('../utils/cookieToken');
 const cloudinary = require('cloudinary').v2;
+
+const mailhelper=require('../utils/mailHelper');
+const { Cursor } = require('mongoose');
+
+
 
 
 exports.signup = async (req, res, next) => {
@@ -100,5 +106,96 @@ exports.logout=async(req,res,next)=>{
 
 }
 
-    
+//mail will be sent
+exports.forgotpassword=async(req,res,next)=>{
+   const {email}=req.body
+
+  const user= await User.findOne({email})
+
+  if(!user){
+    return next(new customError(`user is not registered`,500))
+  }
+
+  const forgotoken=user.getforgotPassword()
+
+   await user.save({validateBeforeSave : false})
+
+   const myurl=`${req.protocol}://${req.get("host")}/password/reset/${forgotoken}`
    
+  const message=`copy paste the link in your url and hit enter${myurl}`
+
+
+ 
+ try{
+     await mailhelper({
+      email:user.email,
+      subject:'regading forgot password from lcoTstrore',
+      message
+
+     })
+
+     res.json({
+      success:'mail sent'
+     })
+ }
+  catch(error){
+    user.forgotpasswordToken=undefined
+    user.forgotpasswordExpiry=undefined
+    await user.save({validateBeforeSave:false})
+    console.log(error)
+    return next(new customError(`email not sent `,500))
+
+  }
+
+}
+
+exports.passwordreset=async(req,res,next)=>{
+  try{
+    const token=req.params.token
+    
+    //since we did not get the encryted token
+    const encryptedtoken=crypto.createHash('sha256').update(token).digest('hex')
+     
+    console.log(encryptedtoken)
+    const user=await User.findOne({
+      forgotpasswordToken:encryptedtoken,
+      forgotpasswordExpiry:{$gt: Date.now()}
+    })
+     console.log(user)
+
+    if(!user){
+      return next(new customError(`user not found or token expired`,400))
+    }
+    
+
+    // const password=req.body
+    // const confirmPassword=req.body
+    
+
+      if(req.body.password!==req.body.confirmPassword){
+        return next(new customError(`password does not match`,200))
+      }
+ 
+
+   user.password=req.body.password
+   user.forgotpasswordToken=undefined
+   user.forgotpasswordExpiry=undefined
+
+   await user.save()
+
+   //send jsomn response or token 
+
+   res.json({
+    success:"success"
+   })
+   Cookietoken(res,user)
+  }
+  catch(error){
+    console.log(error)
+  }
+   
+}
+    
+   //
+  //  "password":"123456",
+  //  "confirmPassword":"123456"
