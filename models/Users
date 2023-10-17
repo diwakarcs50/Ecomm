@@ -23,7 +23,7 @@ const userschema=new mongoose.Schema({
         type:String,
         required:true,
         minlength:[8,'password must be at least 8 characters'],
-        // select:false //when you send the whole object but not password
+        select:false //when you send the whole object but not password
     },
     role:{
         type:String,
@@ -37,7 +37,7 @@ const userschema=new mongoose.Schema({
         },
         secure_url:{
             type:String,
-            requirerd:true
+            required:true
 
         }
     },
@@ -87,13 +87,10 @@ userschema.methods.getforgotPassword=function(){
     const forgotToken=crypto.randomBytes(20).toString('hex')
 
     this.forgotpasswordToken=crypto.createHash('sha256').update(forgotToken).digest('hex')
-    this.forgotpasswordExpiry=Date.now()+ 20*60*1000
+    this.forgotpasswordExpiry=Date.now()+ 20* 60* 60* 1000
 
     return forgotToken
 }
-
-
-
 
 
 module.exports=mongoose.model('User',userschema)

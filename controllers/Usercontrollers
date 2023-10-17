@@ -4,6 +4,7 @@ const customError = require('../utils/customerror');
 const Cookietoken = require('../utils/cookieToken');
 const cloudinary = require('cloudinary').v2;
 
+
 const mailhelper=require('../utils/mailHelper');
 const { Cursor } = require('mongoose');
 
@@ -199,3 +200,57 @@ exports.passwordreset=async(req,res,next)=>{
    //
   //  "password":"123456",
   //  "confirmPassword":"123456"
+
+  exports.dashboard=async(req,res,next)=>{
+       try{
+        const Id=req.user.id
+        const user= await User.findById(Id)
+        if(!user){
+          return next(new customError('user not found',400))
+        }
+         
+
+        res.status(200).json({
+          success:true,
+          user
+
+        })
+
+       }
+       catch(error){
+          return next(new customError('error occured in dashboard',404))
+       }
+  }
+
+  exports.changePassword=async(req,res,next)=>{
+    try{
+      const id=req.user.id
+      const user=await User.findById(id).select("+password")
+
+
+
+
+     const valid= user.IsPasswordValidate(req.body.oldPassword)
+
+      if(!valid){
+        return next(new customError('password not validated',400))
+      }
+      user.password=req.body.newPassword
+
+      await user.save()
+
+      Cookietoken(res,user)
+      res.json({
+        success:true ,
+        user
+      })
+
+     
+    }
+    catch(error){
+      return next(error)
+    }
+    
+    
+
+  }
