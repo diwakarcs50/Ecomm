@@ -1,9 +1,9 @@
 const express=require('express')
 const router=express.Router()
 
-const {signin,logout,forgotpassword,passwordreset,dashboard,changePassword,updateDetails}=require('../controllers/UserControllers')
+const {signin,logout,forgotpassword,passwordreset,dashboard,changePassword,updateDetails,adminAllUser,managerAllUser}=require('../controllers/UserControllers')
 const { resolveContent } = require('nodemailer/lib/shared')
-const { isLoggedIn } = require('../middlewares/users')
+const { isLoggedIn,customRole } = require('../middlewares/users')
 
 
 
@@ -14,6 +14,8 @@ router.route("/password/reset/:token").post(passwordreset)
 router.route("/dashboard").get(isLoggedIn,dashboard)
 router.route("/changepassword").post(isLoggedIn,changePassword)
 router.route("/change/dashboard").post(isLoggedIn,updateDetails)
+router.route("/admin").get(isLoggedIn,customRole('admin'),adminAllUser)
+router.route("/manager").get(isLoggedIn,customRole('manager'),managerAllUser)
 
 
 module.exports=router

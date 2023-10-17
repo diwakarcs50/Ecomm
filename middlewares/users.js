@@ -18,3 +18,17 @@ exports.isLoggedIn=async(req,res,next)=>{
      next();
 
 }
+
+exports.customRole=(...roles)=>{
+    return (req,res,next)=>{
+        // const userrole=req.user.role
+
+        if(!roles.includes(req.user.role)){
+            return next(new customError('the user is not allowed the resource',400))
+        }
+
+        next()
+    }
+    
+
+}

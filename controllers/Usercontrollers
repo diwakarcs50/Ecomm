@@ -311,3 +311,35 @@ exports.passwordreset=async(req,res,next)=>{
        }    
   }
 
+//admin role added
+  exports.adminAllUser=async(req,res,next)=>{
+   try{
+    const users=await User.find()
+    
+    res.json(
+      users
+    )
+
+   }
+   catch(error){
+    return next(error)
+
+   }
+  }
+
+  //manager role added
+  exports.managerAllUser=async(req,res,next)=>{
+    try{
+        const managerUser=await User.find({role: 'manager'})
+        if(!managerUser){
+          return next(new customError('manager user not present',400))
+        }
+        res.json({
+          success:"true",
+          managerUser
+        })
+    }
+    catch(error){
+        return next(error)
+    }
+  }
