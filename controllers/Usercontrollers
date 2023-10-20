@@ -343,3 +343,55 @@ exports.passwordreset=async(req,res,next)=>{
         return next(error)
     }
   }
+
+
+  exports.adminGetOneUser=async(req,res,next)=>{
+    try{
+      const user=await User.findById(req.params.id)
+      if(!user){
+        return next(new customError("user not found of given id",200))
+      }
+
+      res.json({
+        success:true,
+        user
+      
+      })
+
+
+    }
+    catch(error){
+       return next(error)
+    }
+   
+    
+
+  }
+
+  exports.adminCanUpdate=async(req,res,next)=>{
+    try{
+      // const userId=req.params.id
+
+      const newData={
+          name:req.body.name,
+          email:req.body.email,
+          role:req.body.role
+      }
+      const user=await User.findByIdAndUpdate(req.params.id,newData,{
+        new:true,
+        runValidators:true,
+        useFindAndModify:true
+      })
+      res.status(200).json({
+        success:true,
+        user
+      })
+
+  
+    }
+    catch(error){
+      return next(error)
+
+    }
+
+  }
