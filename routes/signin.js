@@ -11,7 +11,8 @@ const {signin,
     adminAllUser,
     managerAllUser,
     adminGetOneUser,
-    adminCanUpdate}=require('../controllers/UserControllers')
+    adminCanUpdate,
+    deleteUser}=require('../controllers/UserControllers')
 const { resolveContent } = require('nodemailer/lib/shared')
 const { isLoggedIn,customRole } = require('../middlewares/users')
 
@@ -29,6 +30,7 @@ router.route("/manager").get(isLoggedIn,customRole('manager'),managerAllUser)
 router.route("/admin/:id")
 .get(isLoggedIn,customRole('admin'),adminGetOneUser)
 .put(isLoggedIn,customRole('admin'),adminCanUpdate)
+.delete(isLoggedIn,customRole('admin'),deleteUser)
 
 
 

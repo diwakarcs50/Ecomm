@@ -6,7 +6,8 @@ const cloudinary = require('cloudinary').v2;
 
 
 const mailhelper=require('../utils/mailHelper');
-const { Cursor } = require('mongoose');
+// const { Cursor } = require('mongoose');
+const mongoose=require('mongoose')
 
 
 
@@ -344,7 +345,7 @@ exports.passwordreset=async(req,res,next)=>{
     }
   }
 
-
+  //admin can get data of a single user
   exports.adminGetOneUser=async(req,res,next)=>{
     try{
       const user=await User.findById(req.params.id)
@@ -368,6 +369,7 @@ exports.passwordreset=async(req,res,next)=>{
 
   }
 
+  //admin can change users credentials
   exports.adminCanUpdate=async(req,res,next)=>{
     try{
       // const userId=req.params.id
@@ -395,3 +397,21 @@ exports.passwordreset=async(req,res,next)=>{
     }
 
   }
+
+  //admin can delete a user
+  exports.deleteUser=async(req,res,next)=>{
+    const user=await User.findById(req.params.id)
+    if(!user){
+      return next(new customError('user not found',404))
+    }
+    const imageId=user.photo.id
+
+    await cloudinary.uploader.destroy(imageId)
+
+    await user.deleteOne()
+    res.status(200).json({
+      success:"user deleted",
+    })
+  }
+
+
