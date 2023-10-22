@@ -14,3 +14,36 @@ This repository contains the backend codebase for our eCommerce application. The
 
    ```bash
    git clone https://github.com/your-username/eCommerce-backend.git
+
+   Navigate to the Project Directory:
+
+bash
+Copy code
+cd eCommerce-backend
+Install Dependencies:
+
+bash
+Copy code
+npm install
+Set Up Environment Variables:
+
+Create a .env file in the root directory. Define the following environment variables:
+
+env
+Copy code
+PORT=3000
+MONGODB_URI=your-mongodb-connection-string
+SECRET_KEY=your-secret-key-for-jwt-token
+Start the Server:
+
+bash
+Copy code
+npm start
+The server will start at http://localhost:3000.
+
+API Endpoints
+GET /api/products: Get a list of all products.
+GET /api/products/:id: Get details of a specific product by ID.
+POST /api/products: Add a new product.
+PUT /api/products/:id: Update details of a specific product by ID.
+DELETE /api/products/:id: Delete a product by ID.
